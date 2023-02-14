@@ -5,7 +5,7 @@ import auth from "./routes/api/auth";
 import user from "./routes/api/user";
 import profile from "./routes/api/profile";
 import course from "./routes/api/course";
-import enrolledcourse from "./routes/api/enrolledcourse";
+import enrolledcourse from "./routes/api/enrolledCourse";
 import cors from "cors";
 
 const app = express();
