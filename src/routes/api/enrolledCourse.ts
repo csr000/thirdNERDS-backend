@@ -19,13 +19,7 @@ router.get("/me", auth, async (req: Request, res: Response) => {
       user: req.userId,
     }).populate("enrolledCourses");
     if (!enrolledcourse) {
-      return res.status(HttpStatusCodes.BAD_REQUEST).json({
-        errors: [
-          {
-            msg: "There is no enrolledcourse for this user",
-          },
-        ],
-      });
+      res.json([{}]);
     }
 
     res.json(enrolledcourse);
