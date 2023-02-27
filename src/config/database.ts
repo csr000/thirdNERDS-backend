@@ -3,7 +3,7 @@ import { connect } from "mongoose";
 
 const connectDB = async () => {
   try {
-    const mongoURI: string = config.get("mongoURI");
+    const mongoURI: any = process.env.mongoURI
     await connect(mongoURI);
     console.log("MongoDB Connected...");
   } catch (err) {

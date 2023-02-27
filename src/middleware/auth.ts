@@ -20,7 +20,7 @@ export default function (req: Request, res: Response, next: NextFunction) {
   try {
     const payload: Payload | any = jwt.verify(
       token,
-      config.get("accessSecret")
+      process.env.accessSecret
     );
     req.userId = payload.userId;
     next();
