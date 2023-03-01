@@ -8,14 +8,18 @@ import course from "./routes/api/course";
 import enrolledcourse from "./routes/api/enrolledCourse";
 import cors from "cors";
 
-import * as dotenv from "dotenv";
-dotenv.config();
-
 const app = express();
+
+// Connect to MongoDB
+connectDB();
 
 // Express configuration
 app.set("port", process.env.PORT || 5000);
-app.use(cors());
+const corsOptions = {
+  origin: '*',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+app.use(cors(corsOptions));
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb" }));
@@ -34,11 +38,8 @@ app.use("/api/enrolledcourse", enrolledcourse);
 app.use("/api/course", course);
 
 const port = app.get("port");
+const server = app.listen(port, () =>
+  console.log(`Server started on port ${port}`)
+);
 
-
-connectDB().then(() => {
-  app.listen(port, () =>
-    console.log(`Server started on port ${port}`)
-  );
-})
-
+export default server;
