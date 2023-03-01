@@ -36,11 +36,7 @@ const enrolledCourse_1 = __importDefault(require("./routes/api/enrolledCourse"))
 const cors_1 = __importDefault(require("cors"));
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
-console.log("new");
 const app = (0, express_1.default)();
-// require('dotenv').config();
-// Connect to MongoDB 
-(0, database_1.default)();
 // Express configuration
 app.set("port", process.env.PORT || 5000);
 app.use((0, cors_1.default)());
@@ -58,6 +54,7 @@ app.use("/api/profile", profile_1.default);
 app.use("/api/enrolledcourse", enrolledCourse_1.default);
 app.use("/api/course", course_1.default);
 const port = app.get("port");
-const server = app.listen(port, () => console.log(`Server started on port ${port}`));
-exports.default = server;
+(0, database_1.default)().then(() => {
+    app.listen(port, () => console.log(`Server started on port ${port}`));
+});
 //# sourceMappingURL=server.js.map
