@@ -10,17 +10,21 @@ import assessment from "./routes/api/assessment";
 import grade from "./routes/api/grade";
 import cors from "cors";
 
-import * as dotenv from "dotenv";
-dotenv.config();
-
 const app = express();
 // require('dotenv').config();
 // Connect to MongoDB
 connectDB();
 
+// Connect to MongoDB
+connectDB();
+
 // Express configuration
 app.set("port", process.env.PORT || 5000);
-app.use(cors());
+const corsOptions = {
+  origin: '*',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+app.use(cors(corsOptions));
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb" }));
