@@ -2,8 +2,11 @@ import { Router, Response } from "express";
 import Request from "../../types/Request";
 
 import Course, { ICourse, IFilteredDoc } from "../../models/Course";
-import { SERVER_ERROR } from "../../utils";
+import { SERVER_ERROR, writelog } from "../../utils";
 import auth from "../../middleware/auth";
+import mongoose from "mongoose";
+import Assessment from "../../models/Assessment";
+import Grade from "../../models/Grade";
 
 const router: Router = Router();
 
@@ -98,7 +101,7 @@ router.post("/deleteCourse", auth, async (req: Request, res: Response) => {
 
 // @route   GET api/course/module/allModuleNames
 // @desc    Get all moduleName with course id
-// return   all courses
+// return   all moduleNames
 router.get(
   "/module/allModuleNames",
   auth,
@@ -106,7 +109,77 @@ router.get(
     const id = req.query.id as string;
     try {
       const params = { _id: 0, courseName: 0, "modules.lessons": 0 };
-      const modules: ICourse = await Course.findById(id, params);
+      let modules: any = await Course.findById(id, params);
+      modules = modules.modules;
+      writelog("modules ", modules.modules);
+
+      // Find all assessments and grades that correspond to the modules
+      modules = await Promise.all(
+        modules.map(async (module: any) => {
+          const assessments = await Assessment.find({
+            moduleId: { $in: module._id },
+          });
+          const grades: any = await Grade.find({ moduleId: { $in: module._id } });
+
+          if (assessments.length !== grades.length) {
+            writelog("Arrays are not the same");
+          } else if (!assessments.length || !grades.length) {
+            writelog("assessment or grade does not exist");
+          } else if (!grades.every((item:any) => item.approved)) { 
+            writelog("not all are approved")
+          } else {
+            // Check if the objects in each array are the same
+            const isEqual = assessments.every((obj: any, index: any) => {
+              const otherObj = grades[index];
+              return JSON.stringify(obj) === JSON.stringify(otherObj);
+            });
+            if (isEqual) {
+              console.log("Arrays are the same");
+            }
+            return {
+              _id: module._id,
+              moduleName: module.moduleName,
+              completed: true,
+            };
+          }
+          return {
+            _id: module._id,
+            moduleName: module.moduleName,
+            completed: false,
+          };
+        })
+      );
+      writelog("modules ", modules);
+      // writelog("assessments ", assessments);
+      // writelog("grades ", grades);
+
+      // // Check if the number of assessments and grades match
+      // if (assessments.length !== grades.length) {
+      //   // The number of assessments and grades do not match, assign completed to false
+      //   modules = modules.map((module: any) => ({
+      //     ...module,
+      //     completed: false,
+      //   }));
+      // } else {
+      //   // The number of assessments and grades match, check if the ids are the same
+      //   const assessmentIdsSet = new Set(
+      //     assessments.map((assessment) => assessment._id.toString())
+      //   );
+      //   const gradeIdsSet = new Set(
+      //     grades.map((grade: any) => grade._id.toString())
+      //   );
+      //   const idsMatch = [...assessmentIdsSet].every((id) =>
+      //     gradeIdsSet.has(id)
+      //   );
+
+      //   console.log(idsMatch);
+      //   // Assign completed to true or false based on whether the ids match
+      //   modules = modules.map((module: any) => ({
+      //     ...module,
+      //     completed: idsMatch,
+      //   }));
+      // }
+
       res.json(modules);
     } catch (err) {
       SERVER_ERROR(res, err);

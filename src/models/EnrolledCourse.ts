@@ -21,7 +21,6 @@ const enrolledCourseSchema: Schema = new Schema({
   enrolledCourses: {
     type: Array,
   },
-
   date: {
     type: Date,
     default: Date.now,

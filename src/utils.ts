@@ -3,10 +3,10 @@ import { Response } from "express";
 
 export const SERVER_ERROR = (res: Response, err: Error) => {
   writelog(err.message);
-  res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send("Server Error");
+  return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send("Server Error");
 };
 
 export const writelog = (...log: unknown[]) => {
-  const isProduction = true;
+  const isProduction = false;
   isProduction ? null : console.log(...log);
 };

@@ -82,7 +82,7 @@ router.post(
         { expiresIn: process.env.accessExpiration },
         (err, accessToken) => {
           if (err) throw err;
-          res.json({ accessToken });
+          return res.json({ accessToken });
         }
       );
     } catch (err) {
@@ -103,8 +103,8 @@ router.get("/all", auth, async (req: Request, res: Response) => {
         if (err) {
           throw err;
         } else {
-          console.log("users", users);
-          res.json(users);
+          // console.log("users", users);
+          return res.json(users);
         }
       });
   } catch (err) {

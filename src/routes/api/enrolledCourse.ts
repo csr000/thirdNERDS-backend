@@ -19,7 +19,7 @@ router.get("/me", auth, async (req: Request, res: Response) => {
       user: req.userId,
     }).populate("enrolledCourses");
     if (!enrolledcourse) {
-      res.json([{}]);
+      return res.json([{}]);
     }
 
     res.json(enrolledcourse);
