@@ -7,7 +7,7 @@
   "scripts": {
     "tsc": "tsc",
     "watch-tsc": "npx tsc",
-    "start": "ts-node-esm src/server.ts",
+    "start": "ts-node-esm source/server.ts",
     "dev": "concurrently \"npm run watch-tsc\" \"npm run dev\""
   },
   "dependencies": {
