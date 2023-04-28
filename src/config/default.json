@@ -1,5 +1,0 @@
-{
-  "mongoURI": "mongodb://0.0.0.0:27017/thirdNerds",
-  "accessSecret": "dummyAccessSecretToken",
-  "accessExpiration": 5400 
-}
