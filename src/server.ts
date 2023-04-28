@@ -9,22 +9,19 @@ import enrolledcourse from "./routes/api/enrolledCourse";
 import assessment from "./routes/api/assessment";
 import grade from "./routes/api/grade";
 import cors from "cors";
+import AuthMiddleware from "./middleware/auth";
+
+import * as dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 // require('dotenv').config();
 // Connect to MongoDB
 connectDB();
 
-// Connect to MongoDB
-connectDB();
-
 // Express configuration
 app.set("port", process.env.PORT || 5000);
-const corsOptions = {
-  origin: '*',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb" }));
@@ -37,10 +34,10 @@ app.get("/", (_req, res) => res.send("API Running"));
 app.use("/api/auth", auth);
 app.use("/api/user", user);
 app.use("/api/profile", profile);
-app.use("/api/enrolledcourse", enrolledcourse);
-app.use("/api/course", course);
-app.use("/api/assessments", assessment);
-app.use("/api/grades", grade);
+app.use("/api/enrolledcourse", AuthMiddleware, enrolledcourse);
+app.use("/api/course", AuthMiddleware, course);
+app.use("/api/assessments", AuthMiddleware, assessment);
+app.use("/api/grades", AuthMiddleware, grade);
 
 const port = app.get("port");
 const server = app.listen(port, () =>

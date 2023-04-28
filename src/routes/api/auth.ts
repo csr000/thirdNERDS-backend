@@ -1,14 +1,13 @@
-import bcrypt from "bcryptjs";
-import config from "config";
-import { Router, Response } from "express";
-import { check, validationResult } from "express-validator";
-import HttpStatusCodes from "http-status-codes";
-import jwt from "jsonwebtoken";
+import bcrypt from 'bcryptjs';
+import { Response, Router } from 'express';
+import { check, validationResult } from 'express-validator';
+import HttpStatusCodes from 'http-status-codes';
+import jwt from 'jsonwebtoken';
 
-import auth from "../../middleware/auth";
-import Payload from "../../types/Payload";
-import Request from "../../types/Request";
-import User, { IUser } from "../../models/User";
+import auth from '../../middleware/auth';
+import User, { IUser } from '../../models/User';
+import Payload from '../../types/Payload';
+import Request from '../../types/Request';
 
 const router: Router = Router();
 

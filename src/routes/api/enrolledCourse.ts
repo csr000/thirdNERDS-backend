@@ -1,19 +1,18 @@
-import { Router, Response } from "express";
-import { check, validationResult } from "express-validator";
+// @access  Private
+import { Response, Router } from "express";
+import { validationResult } from "express-validator";
 import HttpStatusCodes from "http-status-codes";
 
-import auth from "../../middleware/auth";
+import Course from "../../models/Course";
 import EnrolledCourse, { IEnrolledCourse } from "../../models/EnrolledCourse";
+import User from "../../models/User";
 import Request from "../../types/Request";
-import User, { IUser } from "../../models/User";
-import Course, { IFilteredDoc } from "../../models/Course";
 
 const router: Router = Router();
 
 // @route   GET api/enrolledcourse/me
 // @desc    Get current user's enrolledcourses
-// @access  Private
-router.get("/me", auth, async (req: Request, res: Response) => {
+router.get("/me", async (req: Request, res: Response) => {
   try {
     const enrolledcourse: IEnrolledCourse = await EnrolledCourse.findOne({
       user: req.userId,
@@ -31,8 +30,8 @@ router.get("/me", auth, async (req: Request, res: Response) => {
 
 // @route   POST api/enrolledcourse
 // @desc    Create or update user's enrolledcourse
-// @access  Private
-router.post("/", auth, async (req: Request, res: Response) => {
+
+router.post("/", async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res
@@ -116,7 +115,7 @@ router.get("/", async (_req: Request, res: Response) => {
 
 // @route   GET api/enrolledcourse/user/:userId
 // @desc    Get enrolledcourse by userId
-// @access  Public
+
 router.get("/user/:userId", async (req: Request, res: Response) => {
   try {
     const enrolledcourse: IEnrolledCourse = await EnrolledCourse.findOne({
@@ -142,8 +141,7 @@ router.get("/user/:userId", async (req: Request, res: Response) => {
 
 // @route   DELETE api/enrolledcourse
 // @desc    Delete enrolledcourse and user
-// @access  Private
-router.delete("/", auth, async (req: Request, res: Response) => {
+router.delete("/", async (req: Request, res: Response) => {
   try {
     // Remove enrolledcourse
     await EnrolledCourse.findOneAndRemove({ user: req.userId });

@@ -5,10 +5,13 @@ import jwt from "jsonwebtoken";
 
 import Payload from "../types/Payload";
 import Request from "../types/Request";
+import { writelog } from "../utils";
 
 export default function (req: Request, res: Response, next: NextFunction) {
   // Get token from header
   const token = req.header("x-auth-token");
+
+  writelog("token from AuthMiddleware", token)
 
   // Check if no token
   if (!token) {

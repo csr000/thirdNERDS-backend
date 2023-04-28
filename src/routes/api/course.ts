@@ -1,10 +1,10 @@
+// @access  Private
 import { Router, Response } from "express";
 import Request from "../../types/Request";
 
 import Course, { ICourse, IFilteredDoc } from "../../models/Course";
 import { SERVER_ERROR, writelog } from "../../utils";
-import auth from "../../middleware/auth";
-import mongoose from "mongoose";
+
 import Assessment from "../../models/Assessment";
 import Grade from "../../models/Grade";
 
@@ -13,7 +13,7 @@ const router: Router = Router();
 // @route   GET api/course/all
 // @desc    Get all courses with it's modules and lessons
 // return   all courses
-router.get("/all", auth, async (req: Request, res: Response) => {
+router.get("/all", async (req: Request, res: Response) => {
   try {
     const courses = await Course.find();
     res.json(courses);
@@ -25,7 +25,7 @@ router.get("/all", auth, async (req: Request, res: Response) => {
 // @route   GET api/course/allCourseNames
 // @desc    Get all courseName with _id
 // return   all courses
-router.get("/allCourseNames", auth, async (req: Request, res: Response) => {
+router.get("/allCourseNames", async (req: Request, res: Response) => {
   try {
     const courses: ICourse[] = await Course.find();
     const filteredCourseDoc: IFilteredDoc[] = courses.map((item: ICourse) => {
@@ -40,7 +40,7 @@ router.get("/allCourseNames", auth, async (req: Request, res: Response) => {
 // @route   GET api/course/getCourse
 // @desc    Get a particular course given courseName
 // return   course with it's modules & lessons
-router.get("/getCourse", auth, async (req: Request, res: Response) => {
+router.get("/getCourse", async (req: Request, res: Response) => {
   const id = req.query.id;
   try {
     const course = await Course.findById(id);
@@ -53,7 +53,7 @@ router.get("/getCourse", auth, async (req: Request, res: Response) => {
 // @route   POST api/course/addCourse
 // @desc    Add course given courseName
 // return   200 if the course is successfully saved in db.
-router.post("/addCourse", auth, async (req: Request, res: Response) => {
+router.post("/addCourse", async (req: Request, res: Response) => {
   const courseName = req.query.courseName;
   try {
     Course.create({ courseName }, (err) => {
@@ -68,7 +68,7 @@ router.post("/addCourse", auth, async (req: Request, res: Response) => {
 // @route   POST api/course/updateCourse
 // @desc    Update courseName given id
 // return   updated doc if the course is successfully updated in db.
-router.post("/updateCourse", auth, async (req: Request, res: Response) => {
+router.post("/updateCourse", async (req: Request, res: Response) => {
   const id = req.query.id;
   const newCourseName = req.query.newCourseName;
 
@@ -89,7 +89,7 @@ router.post("/updateCourse", auth, async (req: Request, res: Response) => {
 // @route   POST api/course/deleteCourse
 // @desc    Delete course given id
 // return   200 if the course is successfully deleted from db.
-router.post("/deleteCourse", auth, async (req: Request, res: Response) => {
+router.post("/deleteCourse", async (req: Request, res: Response) => {
   const id = req.query.id;
   try {
     await Course.findByIdAndRemove(id);
@@ -104,7 +104,7 @@ router.post("/deleteCourse", auth, async (req: Request, res: Response) => {
 // return   all moduleNames
 router.get(
   "/module/allModuleNames",
-  auth,
+
   async (req: Request, res: Response) => {
     const id = req.query.id as string;
     try {
@@ -119,14 +119,16 @@ router.get(
           const assessments = await Assessment.find({
             moduleId: { $in: module._id },
           });
-          const grades: any = await Grade.find({ moduleId: { $in: module._id } });
+          const grades: any = await Grade.find({
+            moduleId: { $in: module._id },
+          });
 
           if (assessments.length !== grades.length) {
             writelog("Arrays are not the same");
           } else if (!assessments.length || !grades.length) {
             writelog("assessment or grade does not exist");
-          } else if (!grades.every((item:any) => item.approved)) { 
-            writelog("not all are approved")
+          } else if (!grades.every((item: any) => item.approved)) {
+            writelog("not all are approved");
           } else {
             // Check if the objects in each array are the same
             const isEqual = assessments.every((obj: any, index: any) => {
@@ -190,7 +192,7 @@ router.get(
 // @route   POST api/course/module/addModule
 // @desc    Add module given courseName & module
 // return   updated doc if the module is successfully saved in db.
-router.post("/module/addModule", auth, async (req: Request, res: Response) => {
+router.post("/module/addModule", async (req: Request, res: Response) => {
   const id = req.query.id;
   const module = req.query.module;
   try {
@@ -210,7 +212,7 @@ router.post("/module/addModule", auth, async (req: Request, res: Response) => {
 // return   updated doc if the module is successfully updated in db.
 router.post(
   "/module/updateModule",
-  auth,
+
   async (req: Request, res: Response) => {
     const courseId = req.query.courseId;
     const moduleId = req.query.moduleId;
@@ -240,7 +242,7 @@ router.post(
 // return   updated doc if the module is successfully deleted from db.
 router.post(
   "/module/deleteModule",
-  auth,
+
   async (req: Request, res: Response) => {
     const courseId = req.query.courseId;
     const moduleId = req.query.moduleId;
@@ -260,7 +262,7 @@ router.post(
 // @route   GET api/course/module/lesson
 // @desc    Get all lessons under a specific module with _id
 // return   all courses
-router.get("/module/lesson", auth, async (req: Request, res: Response) => {
+router.get("/module/lesson", async (req: Request, res: Response) => {
   const module_id = req.query.module_id as string;
   try {
     const modules: ICourse = await Course.findOne(
@@ -285,48 +287,44 @@ router.get("/module/lesson", auth, async (req: Request, res: Response) => {
 // @route   POST api/course/module/lesson/addLesson
 // @desc    Add Lesson given courseName & moduleName
 // return   updated doc if the lesson has been successfully added from db.
-router.post(
-  "/module/lesson/addLesson",
-  auth,
-  async (req: Request, res: Response) => {
-    const courseId = req.body.courseId;
-    const moduleId = req.body.moduleId;
-    // lesson
-    const title = req.body.title;
-    const objectives = req.body.objectives;
-    const overview = req.body.overview;
-    const keyTerms = req.body.keyTerms;
-    const content = req.body.content;
+router.post("/module/lesson/addLesson", async (req: Request, res: Response) => {
+  const courseId = req.body.courseId;
+  const moduleId = req.body.moduleId;
+  // lesson
+  const title = req.body.title;
+  const objectives = req.body.objectives;
+  const overview = req.body.overview;
+  const keyTerms = req.body.keyTerms;
+  const content = req.body.content;
 
-    try {
-      const update = await Course.findByIdAndUpdate(
-        courseId,
-        {
-          $push: {
-            "modules.$[modulesFilter].lessons": {
-              title,
-              objectives,
-              overview,
-              keyTerms,
-              content,
-            },
+  try {
+    const update = await Course.findByIdAndUpdate(
+      courseId,
+      {
+        $push: {
+          "modules.$[modulesFilter].lessons": {
+            title,
+            objectives,
+            overview,
+            keyTerms,
+            content,
           },
         },
-        {
-          arrayFilters: [
-            {
-              "modulesFilter._id": moduleId,
-            },
-          ],
-          new: true,
-        }
-      );
-      res.json(update);
-    } catch (err) {
-      SERVER_ERROR(res, err);
-    }
+      },
+      {
+        arrayFilters: [
+          {
+            "modulesFilter._id": moduleId,
+          },
+        ],
+        new: true,
+      }
+    );
+    res.json(update);
+  } catch (err) {
+    SERVER_ERROR(res, err);
   }
-);
+});
 
 function removeEmpty(obj: { [s: string]: unknown } | ArrayLike<unknown>) {
   return Object.fromEntries(
@@ -340,7 +338,6 @@ function removeEmpty(obj: { [s: string]: unknown } | ArrayLike<unknown>) {
 // return   updated doc if the lesson has been successfully added from db.
 router.post(
   "/module/lesson/updateLesson",
-  auth,
   async (req: Request, res: Response) => {
     const module_id = req.body.module_id;
     const lesson_id = req.body.lesson_id;
@@ -483,7 +480,7 @@ router.post(
 // return   updated doc if the lesson has been successfully added from db.
 router.post(
   "/module/lesson/deleteLesson",
-  auth,
+
   async (req: Request, res: Response) => {
     const module_id = req.body.module_id;
     const lesson_id = req.body.lesson_id;

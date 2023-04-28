@@ -1,5 +1,14 @@
-import { writelog } from "../../utils";
-import { IAssessment } from "../../models/Assessment";
+import { IAssessment } from '../../models/Assessment';
+import { writelog } from '../../utils';
+
+/**
+ * Compare incoming MCQ answers to existing MCQ answers and calculate a score.
+ * Set incorrect flag on incoming MCQs and return the score and approval status.
+ *
+ * @param incomingMCQs Array of incoming MCQs to compare
+ * @param existingMCQs Array of existing MCQs to compare against
+ * @returns Object with approval status and array of incoming MCQs with incorrect flag set
+ */
 
 export function compareMCQs(
   incomingMCQs: IAssessment["mcq"],
