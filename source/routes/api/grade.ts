@@ -1,12 +1,12 @@
 // @access  Private
-import { Response, Router } from 'express';
-import { validationResult } from 'express-validator';
-import HttpStatusCodes from 'http-status-codes';
+import { Response, Router } from "express";
+import { validationResult } from "express-validator";
+import HttpStatusCodes from "http-status-codes";
 
-import Assessment, { IAssessment } from '../../models/Assessment';
-import Grade, { IGrade } from '../../models/Grade';
-import Request from '../../types/Request';
-import { compareMCQs } from './utils';
+import Assessment, { IAssessment } from "../../models/Assessment";
+import Grade, { IGrade } from "../../models/Grade";
+import Request from "../../types/Request";
+import { compareMCQs } from "./utils";
 
 const router: Router = Router();
 
@@ -15,9 +15,7 @@ const router: Router = Router();
 router.put("/:lessonId", async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res
-      .status(HttpStatusCodes.BAD_REQUEST)
-      .json({ errors: errors.array() });
+    return res.status(HttpStatusCodes.BAD_REQUEST).send(errors.array()[0].msg);
   }
   try {
     const moduleId = req.body.moduleId;
@@ -116,9 +114,6 @@ router.post("/", async (req: Request, res: Response) => {
     const mcqFromDB = questionsFromDB.mcq;
 
     const { approved, incomingMCQs } = compareMCQs(incomingMcq, mcqFromDB);
-
-    console.log("req.userId ", req.userId);
-    // console.log({ incomingtheory });
 
     if (approved) {
       if (!theoryAnswer.trim()) {

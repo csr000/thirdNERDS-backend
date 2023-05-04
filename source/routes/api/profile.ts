@@ -31,9 +31,7 @@ router.get("/me", auth, async (req: Request, res: Response) => {
 router.post("/", auth, async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res
-      .status(HttpStatusCodes.BAD_REQUEST)
-      .json({ errors: errors.array() });
+    return res.status(HttpStatusCodes.BAD_REQUEST).send(errors.array()[0].msg);
   }
 
   const { firstName, lastName, email, platform, git, linkedIn } = req.body;

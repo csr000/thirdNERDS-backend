@@ -1,13 +1,13 @@
-import bcrypt from 'bcryptjs';
-import { Response, Router } from 'express';
-import { check, validationResult } from 'express-validator';
-import HttpStatusCodes from 'http-status-codes';
-import jwt from 'jsonwebtoken';
+import bcrypt from "bcryptjs";
+import { Response, Router } from "express";
+import { check, validationResult } from "express-validator";
+import HttpStatusCodes from "http-status-codes";
+import jwt from "jsonwebtoken";
 
-import auth from '../../middleware/auth';
-import User, { IUser } from '../../models/User';
-import Payload from '../../types/Payload';
-import Request from '../../types/Request';
+import auth from "../../middleware/auth";
+import User, { IUser } from "../../models/User";
+import Payload from "../../types/Payload";
+import Request from "../../types/Request";
 
 const router: Router = Router();
 
@@ -42,7 +42,7 @@ router.post(
     if (!errors.isEmpty()) {
       return res
         .status(HttpStatusCodes.BAD_REQUEST)
-        .json({ errors: errors.array() });
+        .send(errors.array()[0].msg);
     }
 
     const { email, password } = req.body;
@@ -50,25 +50,17 @@ router.post(
       let user: IUser = await User.findOne({ email });
 
       if (!user) {
-        return res.status(HttpStatusCodes.BAD_REQUEST).json({
-          errors: [
-            {
-              msg: "Invalid Credentials",
-            },
-          ],
-        });
+        return res
+          .status(HttpStatusCodes.BAD_REQUEST)
+          .send("Invalid Credentials");
       }
 
       const isMatch = await bcrypt.compare(password, user.password);
 
       if (!isMatch) {
-        return res.status(HttpStatusCodes.BAD_REQUEST).json({
-          errors: [
-            {
-              msg: "Invalid Credentials",
-            },
-          ],
-        });
+        return res
+          .status(HttpStatusCodes.BAD_REQUEST)
+          .send("Invalid Credentials");
       }
 
       const payload: Payload = {
@@ -84,7 +76,6 @@ router.post(
           res.json({ accessToken });
         }
       );
-      
     } catch (err) {
       console.error(err.message);
       res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send("Server Error");

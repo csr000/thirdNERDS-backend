@@ -15,7 +15,6 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-// require('dotenv').config();
 // Connect to MongoDB
 connectDB();
 
@@ -32,10 +31,10 @@ app.use(express.urlencoded({ limit: "50mb" }));
 app.get("/", (_req, res) => res.send("API Running"));
 
 app.use("/api/auth", auth);
-app.use("/api/user", user);
+app.use("/api/users", user);
 app.use("/api/profile", profile);
-app.use("/api/enrolledcourse", AuthMiddleware, enrolledcourse);
-app.use("/api/course", AuthMiddleware, course);
+app.use("/api/enrolledcourses", AuthMiddleware, enrolledcourse);
+app.use("/api/courses", AuthMiddleware, course);
 app.use("/api/assessments", AuthMiddleware, assessment);
 app.use("/api/grades", AuthMiddleware, grade);
 

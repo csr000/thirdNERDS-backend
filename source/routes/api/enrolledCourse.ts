@@ -34,13 +34,10 @@ router.get("/me", async (req: Request, res: Response) => {
 router.post("/", async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res
-      .status(HttpStatusCodes.BAD_REQUEST)
-      .json({ errors: errors.array() });
+    return res.status(HttpStatusCodes.BAD_REQUEST).send(errors.array()[0].msg);
   }
 
   const { enrolledCourseId } = req.body;
-  console.log("enrolledCourseId", enrolledCourseId);
 
   // Build enrolledcourse object based on IEnrolledcourse
   let NewEnrolledCourse = await Course.findById(enrolledCourseId);

@@ -10,19 +10,19 @@ import Grade from "../../models/Grade";
 
 const router: Router = Router();
 
-// @route   GET api/course/all
+// @route   GET api/courses
 // @desc    Get all courses with it's modules and lessons
 // return   all courses
-router.get("/all", async (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response) => {
   try {
-    const courses = await Course.find();
+    const courses = await Course.find().select({ _id: 1, courseName: 1 });
     res.json(courses);
   } catch (err) {
     SERVER_ERROR(res, err);
   }
 });
 
-// @route   GET api/course/allCourseNames
+// @route   GET api/courses/allCourseNames
 // @desc    Get all courseName with _id
 // return   all courses
 router.get("/allCourseNames", async (req: Request, res: Response) => {
@@ -37,7 +37,7 @@ router.get("/allCourseNames", async (req: Request, res: Response) => {
   }
 });
 
-// @route   GET api/course/getCourse
+// @route   GET api/courses/getCourse
 // @desc    Get a particular course given courseName
 // return   course with it's modules & lessons
 router.get("/getCourse", async (req: Request, res: Response) => {
@@ -50,7 +50,7 @@ router.get("/getCourse", async (req: Request, res: Response) => {
   }
 });
 
-// @route   POST api/course/addCourse
+// @route   POST api/courses/addCourse
 // @desc    Add course given courseName
 // return   200 if the course is successfully saved in db.
 router.post("/addCourse", async (req: Request, res: Response) => {
@@ -65,14 +65,12 @@ router.post("/addCourse", async (req: Request, res: Response) => {
   }
 });
 
-// @route   POST api/course/updateCourse
+// @route   POST api/courses/updateCourse
 // @desc    Update courseName given id
 // return   updated doc if the course is successfully updated in db.
 router.post("/updateCourse", async (req: Request, res: Response) => {
   const id = req.query.id;
   const newCourseName = req.query.newCourseName;
-
-  console.log({ id, newCourseName });
 
   try {
     const update = await Course.findByIdAndUpdate(
@@ -86,7 +84,7 @@ router.post("/updateCourse", async (req: Request, res: Response) => {
   }
 });
 
-// @route   POST api/course/deleteCourse
+// @route   POST api/courses/deleteCourse
 // @desc    Delete course given id
 // return   200 if the course is successfully deleted from db.
 router.post("/deleteCourse", async (req: Request, res: Response) => {
@@ -99,20 +97,19 @@ router.post("/deleteCourse", async (req: Request, res: Response) => {
   }
 });
 
-// @route   GET api/course/module/allModuleNames
+// @route   GET api/courses/:courseId/modules
 // @desc    Get all moduleName with course id
 // return   all moduleNames
-router.get(
-  "/module/allModuleNames",
+router.get("/:courseId/modules", async (req: Request, res: Response) => {
+  const id = req.params.courseId as string;
+  const isCompleted =
+    req.query.isCompleted && JSON.parse(req.query.isCompleted as string);
+  try {
+    const params = { _id: 0, courseName: 0, "modules.lessons": 0 };
+    let modules: any = await Course.findById(id, params);
+    modules = modules.modules;
 
-  async (req: Request, res: Response) => {
-    const id = req.query.id as string;
-    try {
-      const params = { _id: 0, courseName: 0, "modules.lessons": 0 };
-      let modules: any = await Course.findById(id, params);
-      modules = modules.modules;
-      writelog("modules ", modules.modules);
-
+    if (isCompleted) {
       // Find all assessments and grades that correspond to the modules
       modules = await Promise.all(
         modules.map(async (module: any) => {
@@ -151,45 +148,14 @@ router.get(
           };
         })
       );
-      writelog("modules ", modules);
-      // writelog("assessments ", assessments);
-      // writelog("grades ", grades);
-
-      // // Check if the number of assessments and grades match
-      // if (assessments.length !== grades.length) {
-      //   // The number of assessments and grades do not match, assign completed to false
-      //   modules = modules.map((module: any) => ({
-      //     ...module,
-      //     completed: false,
-      //   }));
-      // } else {
-      //   // The number of assessments and grades match, check if the ids are the same
-      //   const assessmentIdsSet = new Set(
-      //     assessments.map((assessment) => assessment._id.toString())
-      //   );
-      //   const gradeIdsSet = new Set(
-      //     grades.map((grade: any) => grade._id.toString())
-      //   );
-      //   const idsMatch = [...assessmentIdsSet].every((id) =>
-      //     gradeIdsSet.has(id)
-      //   );
-
-      //   console.log(idsMatch);
-      //   // Assign completed to true or false based on whether the ids match
-      //   modules = modules.map((module: any) => ({
-      //     ...module,
-      //     completed: idsMatch,
-      //   }));
-      // }
-
-      res.json(modules);
-    } catch (err) {
-      SERVER_ERROR(res, err);
     }
+    res.json(modules);
+  } catch (err) {
+    SERVER_ERROR(res, err);
   }
-);
+});
 
-// @route   POST api/course/module/addModule
+// @route   POST api/courses/module/addModule
 // @desc    Add module given courseName & module
 // return   updated doc if the module is successfully saved in db.
 router.post("/module/addModule", async (req: Request, res: Response) => {
@@ -207,7 +173,7 @@ router.post("/module/addModule", async (req: Request, res: Response) => {
   }
 });
 
-// @route   POST api/course/module/updateModule
+// @route   POST api/courses/module/updateModule
 // @desc    Update moduleName given courseName & prevModuleName
 // return   updated doc if the module is successfully updated in db.
 router.post(
@@ -237,7 +203,7 @@ router.post(
   }
 );
 
-// @route   POST api/course/module/deleteModule
+// @route   POST api/courses/module/deleteModule
 // @desc    Delete module given courseName & module
 // return   updated doc if the module is successfully deleted from db.
 router.post(
@@ -259,32 +225,32 @@ router.post(
   }
 );
 
-// @route   GET api/course/module/lesson
+// @route   GET api/courses/module/lesson
 // @desc    Get all lessons under a specific module with _id
 // return   all courses
-router.get("/module/lesson", async (req: Request, res: Response) => {
-  const module_id = req.query.module_id as string;
-  try {
-    const modules: ICourse = await Course.findOne(
-      { "modules._id": module_id },
-      {
-        _id: 0,
-      }
-    );
+router.get(
+  "/modules/:moduleId/lessons",
+  async (req: Request, res: Response) => {
+    const module_id = req.params.moduleId as string;
+    try {
+      const modules: ICourse = await Course.findOne({
+        "modules._id": module_id,
+      }).select("modules.lessons");
 
-    let SelectedModule = modules.modules.filter(
-      (module) => module._id.toString() === module_id
-    );
+      // let SelectedModule = modules.modules.filter(
+      //   (module) => module._id.toString() === module_id
+      // );
 
-    // @ts-ignore
-    SelectedModule.push({ courseName: modules.courseName });
-    res.json(SelectedModule);
-  } catch (err) {
-    SERVER_ERROR(res, err);
+      // // @ts-ignore
+      // SelectedModule.push({ courseName: modules.courseName });
+      res.json(modules.modules[0].lessons);
+    } catch (err) {
+      SERVER_ERROR(res, err);
+    }
   }
-});
+);
 
-// @route   POST api/course/module/lesson/addLesson
+// @route   POST api/courses/module/lesson/addLesson
 // @desc    Add Lesson given courseName & moduleName
 // return   updated doc if the lesson has been successfully added from db.
 router.post("/module/lesson/addLesson", async (req: Request, res: Response) => {
@@ -333,7 +299,7 @@ function removeEmpty(obj: { [s: string]: unknown } | ArrayLike<unknown>) {
   );
 }
 
-// @route   POST api/course/updateLesson
+// @route   POST api/courses/updateLesson
 // @desc    Update module given courseName & module
 // return   updated doc if the lesson has been successfully added from db.
 router.post(
@@ -475,7 +441,7 @@ router.post(
   }
 );
 
-// @route   POST api/course/addLesson
+// @route   POST api/courses/addLesson
 // @desc    Delete module given courseName & module
 // return   updated doc if the lesson has been successfully added from db.
 router.post(

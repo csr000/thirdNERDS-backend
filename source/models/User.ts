@@ -6,6 +6,9 @@ import { Document, model, Schema } from "mongoose";
  * @param password:string
  * @param permission:string
  * @param avatar:string
+ * @param enrolledCourse:Schema.Types.ObjectId
+ * @param hash:string
+ * @param date:Schema.Types.Date
  */
 
 export interface IUser extends Document {
@@ -13,7 +16,11 @@ export interface IUser extends Document {
   password: string;
   permission: string;
   avatar: string;
+  enrolledCourse: Schema.Types.ObjectId;
+  hash: string;
+  date: Schema.Types.Date;
 }
+
 export interface IFilteredUsersDoc {
   email: string;
   permission: string;
@@ -36,6 +43,9 @@ const userSchema: Schema = new Schema({
   enrolledCourse: {
     type: Schema.Types.ObjectId,
     ref: "EnrolledCourse",
+  },
+  hash: {
+    type: String,
   },
   date: {
     type: Date,
