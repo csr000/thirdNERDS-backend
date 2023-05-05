@@ -9,8 +9,8 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "*": ["node_modules/*", "source1/types/*"]
+      "*": ["node_modules/*", "source2/types/*"]
     }
   },
-  "include": ["source1/**/*"]
+  "include": ["source2/**/*"]
 }
