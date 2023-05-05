@@ -7,7 +7,7 @@
   "scripts": {
     "tsc": "tsc",
     "watch-tsc": "npx tsc",
-    "start": "ts-node-esm source3/server.ts",
+    "start": "ts-node-esm source4/server.ts",
     "dev": "concurrently \"npm run watch-tsc\" \"npm run dev\"",
     "quick-push": "git add . && git commit -m \"quick push\" && git push"
   },
