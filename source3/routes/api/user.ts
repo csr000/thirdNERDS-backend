@@ -158,7 +158,7 @@ router.post("/reset-password", async (req: Request, res: Response) => {
 
     if (!user.hash) {
       const salt = await bcrypt.genSalt(10);
-      const hash = await bcrypt.hash(user._id.toString(), salt);
+      const hash = user._id.toString()
       await User.findByIdAndUpdate(user._id.toString(), { hash });
       // refetch user
       user = await User.findOne({ email });
@@ -212,7 +212,7 @@ router.put(
     try {
       await User.findOneAndUpdate({ hash }, { password });
 
-      res.status(200).send();
+      res.status(200).json({message: "ok"});
     } catch (err) {
       console.error(err.message);
       res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send(err.message);

@@ -11,8 +11,8 @@ import grade from "./routes/api/grade";
 import cors from "cors";
 import AuthMiddleware from "./middleware/auth";
 
-import * as dotenv from "dotenv";
-dotenv.config();
+// import * as dotenv from "dotenv";
+// dotenv.config();
 
 const app = express();
 // Connect to MongoDB
