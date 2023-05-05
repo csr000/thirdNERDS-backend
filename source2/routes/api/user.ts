@@ -166,7 +166,7 @@ router.post("/reset-password", async (req: Request, res: Response) => {
 
     sendResetPasswordEmail(email, user.hash);
 
-    res.status(200).send();
+    res.status(200).json({message: "ok"});
   } catch (err) {
     console.error(err.message);
     res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send(err.message);

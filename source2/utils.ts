@@ -11,3 +11,4 @@ export const SERVER_ERROR = (res: Response, err: Error) => {
 export const writelog = (...log: unknown[]) => {
   !isProduction && console.log(...log);
 };
+
